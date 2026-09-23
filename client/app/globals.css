@@ -1,0 +1,185 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --background: 0 0% 100%;
+  --foreground: 222 47% 11%;
+  --card: 0 0% 100%;
+  --card-foreground: 222 47% 11%;
+  --border: 214 32% 91%;
+  --muted: 210 40% 96%;
+  --muted-foreground: 215 16% 47%;
+  --accent: 239 84% 67%;
+  --accent-foreground: 0 0% 100%;
+}
+
+.dark {
+  --background: 222 47% 4%;
+  --foreground: 210 40% 98%;
+  --card: 222 47% 6%;
+  --card-foreground: 210 40% 98%;
+  --border: 217 33% 17%;
+  --muted: 217 33% 12%;
+  --muted-foreground: 215 20% 65%;
+  --accent: 239 84% 67%;
+  --accent-foreground: 0 0% 100%;
+}
+
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-border: hsl(var(--border));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui;
+  --font-display: var(--font-cal), var(--font-inter), ui-sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+html,
+body {
+  height: 100%;
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+pre,
+code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+}
+
+pre {
+  background: hsl(var(--muted));
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.5rem;
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 6px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
+}
+
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 8s ease infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Fix light-mode code block contrast */
+:root:not(.dark) pre,
+:root:not(.dark) code {
+  color: hsl(var(--foreground));
+}
+
+:root:not(.dark) pre {
+  background: hsl(var(--muted));
+  border-color: hsl(var(--border));
+}
+
+/* CodeMirror base colors */
+.cm-editor {
+  background: transparent !important;
+}
+
+.cm-editor .cm-scroller {
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+}
+
+.cm-editor .cm-gutters {
+  background: transparent !important;
+  border-right: 1px solid hsl(var(--border));
+}
+
+/* Light mode CodeMirror overrides */
+:root:not(.dark) .cm-editor .cm-content {
+  color: hsl(var(--foreground));
+}
+
+:root:not(.dark) .cm-editor .cm-gutters {
+  color: hsl(var(--muted-foreground));
+}
+
+/* Prevent horizontal overflow everywhere */
+html,
+body {
+  width: 100%;
+  overflow-x: hidden; /* Fixed: Removed max-width: 100vw to prevent scrollbar width issues */
+}
+
+/* Code blocks should scroll horizontally, not break words */
+pre {
+  max-width: 100%;
+  overflow-x: auto;
+  /* Removed word-break and white-space: pre-wrap to keep SQL code formatting intact */
+}
+
+pre code {
+  white-space: pre; /* Keeps code formatting intact instead of wrapping mid-word */
+}
+
+/* Long unbreakable strings (URLs, hashes) wrap instead of pushing layout */
+.break-all {
+  word-break: break-all;
+}
+
+/* Cards and containers never exceed parent */
+[data-slot="card"],
+[class*="rounded-xl"],
+[class*="rounded-lg"] {
+  max-width: 100%;
+}
+
+/* Images, SVGs, and iframes stay inside containers */
+img,
+svg,
+video,
+iframe {
+  max-width: 100%;
+  height: auto;
+}

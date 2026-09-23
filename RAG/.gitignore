@@ -1,0 +1,24 @@
+# =========================
+# Python / FastAPI / RAG
+# =========================
+__pycache__/
+*.py[cod]
+.venv/
+.env
+.dist/
+dist/
+build/
+*.egg-info/
+
+# =========================
+# IDE / Editor
+# =========================
+.vscode/
+.idea/
+
+# =========================
+# General / OS
+# =========================
+.DS_Store
+Thumbs.db
+*.log
