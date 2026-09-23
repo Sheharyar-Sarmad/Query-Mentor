@@ -5,9 +5,10 @@ Local:
     python server.py
 
 Production (Render):
-    uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    python server.py
 """
 
+import os
 import uvicorn
 
 from app.config.settings import settings
@@ -32,9 +33,12 @@ class DevServer:
 
 
 if __name__ == "__main__":
+    # Use the port Render provides, or fall back to 8000 for local dev
+    port = int(os.environ.get("PORT", 8000))
+    
     dev = DevServer(
         host="0.0.0.0" if settings.is_production else "127.0.0.1",
-        port=8000,
+        port=port,
         reload=settings.is_development,
     )
     dev.run()

@@ -24,7 +24,7 @@ import time
 from dataclasses import dataclass, field
 from typing import Any, Optional
 
-from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_community.embeddings import FastEmbedEmbeddings
 from langchain_pinecone import PineconeVectorStore
 from pinecone import Pinecone, ServerlessSpec
 from tenacity import (
@@ -119,7 +119,7 @@ class RetrieverService:
         self._settings = config or global_settings
 
         # Lazy-loaded resources + their locks
-        self._embeddings: Optional[HuggingFaceEmbeddings] = None
+        self._embeddings: Optional[FastEmbedEmbeddings] = None
         self._embeddings_lock = threading.Lock()
 
         self._pinecone: Optional[Pinecone] = None
@@ -139,7 +139,7 @@ class RetrieverService:
     # ────────────────────────────────────────────────────────
 
     @property
-    def embeddings(self) -> HuggingFaceEmbeddings:
+    def embeddings(self) -> FastEmbedEmbeddings:
         if self._embeddings is None:
             with self._embeddings_lock:
                 if self._embeddings is None:
@@ -148,9 +148,8 @@ class RetrieverService:
                         self._settings.EMBEDDING_MODEL,
                     )
                     start = time.perf_counter()
-                    self._embeddings = HuggingFaceEmbeddings(
+                    self._embeddings = FastEmbedEmbeddings(
                         model_name=self._settings.EMBEDDING_MODEL,
-                        encode_kwargs={"normalize_embeddings": True},
                     )
                     elapsed = (time.perf_counter() - start) * 1000
                     logger.info("Embedding model loaded in %.0f ms", elapsed)
