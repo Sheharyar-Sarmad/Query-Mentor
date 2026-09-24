@@ -1,57 +1,22 @@
-# ============================================================
-# Core Web Framework
-# ============================================================
-fastapi~=0.115.0
-uvicorn[standard]~=0.32.0
-python-multipart~=0.0.18
-
-# ============================================================
-# Configuration & Environment
-# ============================================================
-python-dotenv~=1.0.1
-pydantic~=2.10.0
-pydantic-settings~=2.6.0
-
-# ============================================================
-# LangChain Core & Integrations
-# ============================================================
-langchain~=0.3.14
-langchain-core~=0.3.29
-langchain-community~=0.3.14
-langchain-text-splitters~=0.3.5
-
-# ============================================================
-# LLM Provider (Groq)
-# ============================================================
-langchain-groq~=0.2.3
-groq~=0.13.0
-
-# ============================================================
-# Vector Database (Pinecone)
-# ============================================================
-langchain-pinecone~=0.2.3
-pinecone~=5.4.0
-
-# ============================================================
-# Embeddings (Lightweight ONNX)
-# ============================================================
-fastembed~=0.4.0
-huggingface-hub~=0.27.0
-
-# ============================================================
-# Document Loading
-# ============================================================
-pypdf~=5.1.0
-
-# ============================================================
-# Caching
-# ============================================================
-cachetools~=5.5.0
-numpy~=2.0.0
-
-# ============================================================
-# Utilities
-# ============================================================
-aiofiles~=24.1.0
-httpx~=0.28.0
-tenacity~=9.0.0
+fastapi
+uvicorn
+python-multipart
+python-dotenv
+pydantic
+pydantic-settings
+langchain
+langchain-core
+langchain-community
+langchain-text-splitters
+langchain-groq
+groq
+langchain-pinecone
+pinecone
+fastembed
+huggingface-hub
+pypdf
+cachetools
+numpy
+aiofiles
+httpx
+tenacity
