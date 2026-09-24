@@ -1,22 +1,38 @@
-fastapi
-uvicorn
-python-multipart
-python-dotenv
-pydantic
-pydantic-settings
-langchain
-langchain-core
-langchain-community
-langchain-text-splitters
-langchain-groq
-groq
-langchain-pinecone
-pinecone
-fastembed
-huggingface-hub
-pypdf
-cachetools
-numpy
-aiofiles
-httpx
-tenacity
+fastapi==0.115.6
+uvicorn[standard]==0.32.1
+python-multipart==0.0.20
+
+python-dotenv==1.0.1
+pydantic==2.10.4
+pydantic-settings==2.7.0
+
+# --- Core LangChain Ecosystem (Hard Pinned to compatible 0.3.x) ---
+langchain==0.3.14
+langchain-core==0.3.29
+langchain-community==0.3.14
+langchain-text-splitters==0.3.5
+
+# --- LLM Provider (Groq) ---
+langchain-groq==0.2.3
+groq==0.13.0
+
+# --- Vector Database (Pinecone) ---
+# Note: 0.2.2 is used here as it strictly requires langchain-core>=0.3.29, avoiding the 0.4.x trap.
+langchain-pinecone==0.2.2
+pinecone==5.4.0
+
+# --- Embeddings (Lightweight ONNX) ---
+fastembed==0.4.2
+huggingface-hub==0.27.1
+
+# --- Document Loading ---
+pypdf==5.1.0
+
+# --- Caching ---
+cachetools==5.5.0
+numpy==2.0.2
+
+# --- Utilities ---
+aiofiles==24.1.0
+httpx==0.28.1
+tenacity==9.0.0
