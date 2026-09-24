@@ -47,10 +47,7 @@ from app.services.retriever import RetrieverService, get_retriever_service
 logger = logging.getLogger(__name__)
 
 
-# ────────────────────────────────────────────────────────────
 # Errors
-# ────────────────────────────────────────────────────────────
-
 class IngestionError(Exception):
     """Base ingestion error."""
 
@@ -63,10 +60,7 @@ class EmptyDocumentError(IngestionError):
     """PDF yielded no text — likely scanned images."""
 
 
-# ────────────────────────────────────────────────────────────
 # Stats
-# ────────────────────────────────────────────────────────────
-
 @dataclass
 class IngestionStats:
     """Metrics recorded for a single ingestion run."""
@@ -100,10 +94,7 @@ class IngestionStats:
         }
 
 
-# ────────────────────────────────────────────────────────────
 # IngestionService
-# ────────────────────────────────────────────────────────────
-
 class IngestionService:
     """Bulk ingestion of the SQL reference into Pinecone."""
 
@@ -119,10 +110,7 @@ class IngestionService:
         self._retriever = retriever or get_retriever_service()
         self._settings = config or global_settings
 
-    # ────────────────────────────────────────────────────────
     # Helpers
-    # ────────────────────────────────────────────────────────
-
     @staticmethod
     def file_sha256(path: Path) -> str:
         h = hashlib.sha256()
@@ -146,10 +134,7 @@ class IngestionService:
             ],
         )
 
-    # ────────────────────────────────────────────────────────
     # Version tracking
-    # ────────────────────────────────────────────────────────
-
     def _current_index_version(self, namespace: str) -> Optional[str]:
         """Read the version tag on existing vectors, or None if empty."""
         try:
@@ -195,10 +180,7 @@ class IngestionService:
             logger.warning("Namespace delete failed: %s", exc)
             return 0
 
-    # ────────────────────────────────────────────────────────
     # Load + chunk
-    # ────────────────────────────────────────────────────────
-
     def load_and_chunk(self, pdf_path: Path, stats: IngestionStats) -> list[Document]:
         logger.info("Loading PDF: %s", pdf_path)
         start = time.perf_counter()
@@ -243,10 +225,7 @@ class IngestionService:
 
         return unique
 
-    # ────────────────────────────────────────────────────────
     # Metadata
-    # ────────────────────────────────────────────────────────
-
     def tag_metadata(
         self,
         chunks: list[Document],
@@ -261,10 +240,7 @@ class IngestionService:
                 "namespace": namespace,
             })
 
-    # ────────────────────────────────────────────────────────
     # Upsert (with retries)
-    # ────────────────────────────────────────────────────────
-
     def _make_store(self) -> PineconeVectorStore:
         return PineconeVectorStore(
             index=self._retriever.index,
@@ -331,10 +307,7 @@ class IngestionService:
             uploaded, total, time.perf_counter() - start,
         )
 
-    # ────────────────────────────────────────────────────────
     # Main entry point
-    # ────────────────────────────────────────────────────────
-
     def run(
         self,
         pdf_path: Path,
@@ -411,10 +384,7 @@ class IngestionService:
         return stats
 
 
-# ────────────────────────────────────────────────────────────
 # CLI
-# ────────────────────────────────────────────────────────────
-
 def _configure_logging(verbose: bool) -> None:
     logging.basicConfig(
         level=logging.DEBUG if verbose else logging.INFO,

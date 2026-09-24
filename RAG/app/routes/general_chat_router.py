@@ -38,11 +38,7 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/chat", tags=["General Chat"])
 
-
-# ────────────────────────────────────────────────────────────
 # Schemas
-# ────────────────────────────────────────────────────────────
-
 class ChatRequest(BaseModel):
     message: str = Field(..., min_length=1, max_length=2000)
 
@@ -54,10 +50,7 @@ class ChatResponse(BaseModel):
     timings_ms: dict[str, float]
 
 
-# ────────────────────────────────────────────────────────────
 # Handler
-# ────────────────────────────────────────────────────────────
-
 class GeneralChatHandler:
     """Encapsulates the /chat business flow."""
 
@@ -67,10 +60,7 @@ class GeneralChatHandler:
         self._cache = cache
         self._llm = llm
 
-    # ────────────────────────────────────────────────────────
     # Cache
-    # ────────────────────────────────────────────────────────
-
     def _check_cache(self, message: str) -> tuple[dict | None, str, float]:
         """
         Semantic cache is enabled for this namespace because user input is
@@ -87,10 +77,8 @@ class GeneralChatHandler:
         except Exception as exc:
             logger.warning("Cache write failed: %s", exc)
 
-    # ────────────────────────────────────────────────────────
-    # LLM
-    # ────────────────────────────────────────────────────────
 
+    # LLM
     def _generate(self, message: str) -> tuple[str, float]:
         start = time.perf_counter()
 
@@ -123,10 +111,7 @@ class GeneralChatHandler:
 
         return reply, (time.perf_counter() - start) * 1000
 
-    # ────────────────────────────────────────────────────────
     # Public entry point — buffered
-    # ────────────────────────────────────────────────────────
-
     def handle(self, req: ChatRequest, request_id: str) -> ChatResponse:
         timings: dict[str, float] = {}
         total_start = time.perf_counter()
@@ -170,20 +155,13 @@ class GeneralChatHandler:
             timings_ms=timings,
         )
 
-
-# ────────────────────────────────────────────────────────────
 # Request ID helper
-# ────────────────────────────────────────────────────────────
-
 def _get_request_id(request: Request) -> str:
     rid = request.headers.get("x-request-id")
     return rid or str(uuid.uuid4())[:8]
 
 
-# ────────────────────────────────────────────────────────────
 # Routes
-# ────────────────────────────────────────────────────────────
-
 @router.post("", response_model=ChatResponse)
 async def chat(
     req: ChatRequest,

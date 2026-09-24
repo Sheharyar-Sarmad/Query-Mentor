@@ -1,18 +1,17 @@
-"""
-QueryMentor — FastAPI application.
+# QueryMentor — FastAPI application.
 
-The Server class wires everything:
-    - Lifespan with warm-up + timing
-    - CORS (env-aware)
-    - Rate limit middleware
-    - Request ID middleware (X-Request-Id in/out)
-    - Access log middleware (method, path, status, duration)
-    - Global exception handlers (consistent JSON errors)
-    - 4 API routers
-    - System + admin endpoints with real dependency health checks
+# The Server class wires everything:
+#     - Lifespan with warm-up + timing
+#     - CORS (env-aware)
+#     - Rate limit middleware
+#     - Request ID middleware (X-Request-Id in/out)
+#     - Access log middleware (method, path, status, duration)
+#     - Global exception handlers (consistent JSON errors)
+#     - 4 API routers
+#     - System + admin endpoints with real dependency health checks
 
-`app` is the ASGI target.
-"""
+# `app` is the ASGI target.
+
 
 import logging
 import time
@@ -35,11 +34,7 @@ from app.routes import (
     text_to_sql_router,
 )
 
-
-# ────────────────────────────────────────────────────────────
 # Logging
-# ────────────────────────────────────────────────────────────
-
 def _configure_logging() -> None:
     logging.basicConfig(
         level=logging.INFO,
@@ -50,11 +45,7 @@ def _configure_logging() -> None:
 
 logger = logging.getLogger("querymentor")
 
-
-# ────────────────────────────────────────────────────────────
 # Middleware
-# ────────────────────────────────────────────────────────────
-
 class RateLimitMiddleware(BaseHTTPMiddleware):
     """In-memory per-IP rate limiter. Good enough for a single instance."""
 
@@ -100,15 +91,13 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
 
 class RequestContextMiddleware(BaseHTTPMiddleware):
-    """
-    Attaches a request ID and an access log entry to every request.
+    # Attaches a request ID and an access log entry to every request.
 
-    - Reads X-Request-Id from the incoming request (if provided)
-    - Generates one otherwise
-    - Echoes it back on the response
-    - Logs method, path, status, and duration
-    """
-
+    # - Reads X-Request-Id from the incoming request (if provided)
+    # - Generates one otherwise
+    # - Echoes it back on the response
+    # - Logs method, path, status, and duration
+    
     async def dispatch(self, request: Request, call_next):
         # Accept or generate request id
         rid = request.headers.get("x-request-id") or str(uuid.uuid4())[:8]
@@ -138,13 +127,9 @@ class RequestContextMiddleware(BaseHTTPMiddleware):
 
         return response
 
-
-# ────────────────────────────────────────────────────────────
 # Server
-# ────────────────────────────────────────────────────────────
-
 class Server:
-    """Builds and configures the FastAPI application."""
+    # Builds and configures the FastAPI application
 
     def __init__(self, config: Settings | None = None) -> None:
         _configure_logging()
@@ -157,10 +142,7 @@ class Server:
         self._add_admin_routes()
         self._add_exception_handlers()
 
-    # ────────────────────────────────────────────────────────
     # App creation
-    # ────────────────────────────────────────────────────────
-
     def _create_app(self) -> FastAPI:
         return FastAPI(
             title=self._settings.APP_NAME,
@@ -175,11 +157,8 @@ class Server:
             openapi_url=None if self._settings.is_production else "/openapi.json",
             lifespan=self._lifespan,
         )
-
-    # ────────────────────────────────────────────────────────
+    
     # Lifespan
-    # ────────────────────────────────────────────────────────
-
     @asynccontextmanager
     async def _lifespan(self, app: FastAPI):
         logger.info(
@@ -203,10 +182,7 @@ class Server:
 
         logger.info("%s stopped", self._settings.APP_NAME)
 
-    # ────────────────────────────────────────────────────────
     # Middleware
-    # ────────────────────────────────────────────────────────
-
     def _add_middleware(self) -> None:
         origins = (
             ["*"]
@@ -233,10 +209,7 @@ class Server:
         )
         self.app.add_middleware(RequestContextMiddleware)
 
-    # ────────────────────────────────────────────────────────
     # Routers
-    # ────────────────────────────────────────────────────────
-
     def _include_routers(self) -> None:
         prefix = self._settings.APP_BASE_ROUTE_PREFIX
         self.app.include_router(text_to_sql_router, prefix=prefix)
@@ -244,10 +217,7 @@ class Server:
         self.app.include_router(simulate_router, prefix=prefix)
         self.app.include_router(general_chat_router, prefix=prefix)
 
-    # ────────────────────────────────────────────────────────
     # System routes
-    # ────────────────────────────────────────────────────────
-
     def _add_system_routes(self) -> None:
         @self.app.get("/", tags=["System"])
         async def root() -> dict:
@@ -261,11 +231,11 @@ class Server:
 
         @self.app.get("/health", tags=["System"])
         async def health() -> JSONResponse:
-            """
-            Deep health check — verifies each service.
+            
+            # Deep health check — verifies each service.
 
-            Returns 200 if all services are reachable, 503 otherwise.
-            """
+            # Returns 200 if all services are reachable, 503 otherwise.
+            
             checks: dict[str, dict] = {}
             overall_ok = True
 
@@ -325,10 +295,7 @@ class Server:
                 content=payload,
             )
 
-    # ────────────────────────────────────────────────────────
     # Admin routes
-    # ────────────────────────────────────────────────────────
-
     def _add_admin_routes(self) -> None:
         prefix = self._settings.APP_BASE_ROUTE_PREFIX
 
@@ -366,10 +333,7 @@ class Server:
             stats = IngestionService().run(pdf_path=pdf_path, force=force)
             return stats.to_dict()
 
-    # ────────────────────────────────────────────────────────
     # Exception handlers
-    # ────────────────────────────────────────────────────────
-
     def _add_exception_handlers(self) -> None:
         @self.app.exception_handler(RequestValidationError)
         async def validation_error_handler(
@@ -422,10 +386,6 @@ class Server:
                 },
             )
 
-
-# ────────────────────────────────────────────────────────────
 # ASGI target
-# ────────────────────────────────────────────────────────────
-
 server = Server()
 app = server.app

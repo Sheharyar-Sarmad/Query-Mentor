@@ -85,10 +85,7 @@ class CacheManager:
 
         self._init_sqlite()
 
-    # ────────────────────────────────────────────────────
     # Initialization
-    # ────────────────────────────────────────────────────
-
     def _init_sqlite(self) -> None:
         try:
             with sqlite3.connect(self._sqlite_path) as conn:
@@ -127,10 +124,8 @@ class CacheManager:
             logger.warning("Semantic cache corrupt or unreadable: %s — starting fresh", exc)
             self._semantic_entries = []
 
-    # ────────────────────────────────────────────────────
-    # Key construction
-    # ────────────────────────────────────────────────────
 
+    # Key construction
     @staticmethod
     def _make_key(namespace: str, query: str, extras: Optional[dict] = None) -> str:
         version = os.getenv("DOC_VERSION", "v0")
@@ -150,10 +145,7 @@ class CacheManager:
     def _semantic_enabled(namespace: str) -> bool:
         return namespace in SEMANTIC_NAMESPACES
 
-    # ────────────────────────────────────────────────────
     # L1 — in-memory
-    # ────────────────────────────────────────────────────
-
     def _l1_get(self, key: str) -> Any | None:
         with self._l1_lock:
             return self._l1.get(key)
@@ -162,10 +154,7 @@ class CacheManager:
         with self._l1_lock:
             self._l1[key] = value
 
-    # ────────────────────────────────────────────────────
     # L2 — SQLite
-    # ────────────────────────────────────────────────────
-
     def _l2_get(self, key: str) -> Any | None:
         try:
             with sqlite3.connect(self._sqlite_path) as conn:
@@ -230,10 +219,8 @@ class CacheManager:
         except sqlite3.Error:
             pass
 
-    # ────────────────────────────────────────────────────
-    # L3 — semantic
-    # ────────────────────────────────────────────────────
 
+    # L3 — semantic
     def _embed(self, text: str) -> Optional[list[float]]:
         """Lazy import to avoid a circular dependency with RetrieverService."""
         try:
@@ -351,10 +338,7 @@ class CacheManager:
             self._evict_semantic_if_needed()
             self._save_semantic_atomic()
 
-    # ────────────────────────────────────────────────────
     # Public API
-    # ────────────────────────────────────────────────────
-
     def get(
         self,
         namespace: str,
@@ -433,10 +417,7 @@ class CacheManager:
         self._l1_set(key, payload)
         self._l2_set(key, namespace, payload)
 
-    # ────────────────────────────────────────────────────
     # Introspection
-    # ────────────────────────────────────────────────────
-
     def stats(self) -> dict:
         try:
             with sqlite3.connect(self._sqlite_path) as conn:
@@ -485,8 +466,7 @@ class CacheManager:
                 self._semantic_path.unlink(missing_ok=True)
 
 
-# ─── Module-level singleton ─────────────────────────────
-
+# Module-level singleton 
 _cache_instance: Optional[CacheManager] = None
 _cache_lock = threading.Lock()
 

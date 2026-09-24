@@ -42,10 +42,7 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/sql-to-text", tags=["SQL → Text"])
 
 
-# ────────────────────────────────────────────────────────────
 # Schemas
-# ────────────────────────────────────────────────────────────
-
 class SqlToTextRequest(BaseModel):
     sql: str = Field(..., min_length=1, max_length=5000)
 
@@ -65,10 +62,7 @@ class SqlToTextResponse(BaseModel):
     timings_ms: dict[str, float]
 
 
-# ────────────────────────────────────────────────────────────
 # Keyword extraction
-# ────────────────────────────────────────────────────────────
-
 class SQLKeywordExtractor:
     """
     Extracts SQL clauses from a query to prime the retriever.
@@ -148,11 +142,7 @@ class SQLKeywordExtractor:
 
         return " ".join(ordered)
 
-
-# ────────────────────────────────────────────────────────────
 # Handler
-# ────────────────────────────────────────────────────────────
-
 class SqlToTextHandler:
     """Encapsulates the /sql-to-text business flow."""
 
@@ -170,10 +160,7 @@ class SqlToTextHandler:
         self._llm = llm
         self._extractor = SQLKeywordExtractor()
 
-    # ────────────────────────────────────────────────────────
     # Pipeline steps
-    # ────────────────────────────────────────────────────────
-
     def _check_cache(self, sql: str) -> tuple[dict | None, str, float]:
         """
         Exact-match lookup only — semantic cache is disabled for SQL input
@@ -278,10 +265,7 @@ class SqlToTextHandler:
             "tips": [str(t) for t in (result.get("tips") or [])],
         }, (time.perf_counter() - start) * 1000
 
-    # ────────────────────────────────────────────────────────
     # Public entry point
-    # ────────────────────────────────────────────────────────
-
     def handle(
         self,
         req: SqlToTextRequest,
@@ -357,20 +341,13 @@ class SqlToTextHandler:
             timings_ms=timings,
         )
 
-
-# ────────────────────────────────────────────────────────────
 # Request ID helper
-# ────────────────────────────────────────────────────────────
-
 def _get_request_id(request: Request) -> str:
     rid = request.headers.get("x-request-id")
     return rid or str(uuid.uuid4())[:8]
 
 
-# ────────────────────────────────────────────────────────────
 # Routes
-# ────────────────────────────────────────────────────────────
-
 @router.post("", response_model=SqlToTextResponse)
 async def sql_to_text(
     req: SqlToTextRequest,

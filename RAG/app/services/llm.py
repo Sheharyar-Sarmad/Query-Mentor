@@ -42,10 +42,7 @@ from app.services.prompts import PromptLibrary
 logger = logging.getLogger(__name__)
 
 
-# ────────────────────────────────────────────────────────────
 # Errors
-# ────────────────────────────────────────────────────────────
-
 class LLMError(Exception):
     """Base class for LLM service errors."""
 
@@ -62,10 +59,7 @@ class LLMUnavailableError(LLMError):
     """All configured models failed."""
 
 
-# ────────────────────────────────────────────────────────────
 # Usage tracking
-# ────────────────────────────────────────────────────────────
-
 @dataclass
 class CallStats:
     """Per-call metrics."""
@@ -117,10 +111,7 @@ class UsageTracker:
             }
 
 
-# ────────────────────────────────────────────────────────────
 # Prompt-injection detection
-# ────────────────────────────────────────────────────────────
-
 _INJECTION_PATTERNS = [
     re.compile(r"ignore\s+(all\s+)?previous\s+instructions", re.I),
     re.compile(r"disregard\s+(all\s+)?(previous|prior)\s+", re.I),
@@ -142,10 +133,7 @@ def _sanitize_user_input(text: str) -> str:
     return cleaned
 
 
-# ────────────────────────────────────────────────────────────
 # LLMService
-# ────────────────────────────────────────────────────────────
-
 class LLMService:
     """Production wrapper around Groq with retries and observability."""
 
@@ -165,10 +153,7 @@ class LLMService:
         # if you want automatic model failover.
         self._fallback_models: list[str] = []
 
-    # ────────────────────────────────────────────────────────
     # LLM factory
-    # ────────────────────────────────────────────────────────
-
     @property
     def llm(self) -> ChatGroq:
         if self._llm is None:
@@ -187,10 +172,7 @@ class LLMService:
             max_retries=0,  # we handle retries ourselves
         )
 
-    # ────────────────────────────────────────────────────────
     # Retry-wrapped invoke
-    # ────────────────────────────────────────────────────────
-
     def _retry_invoke(self, prompt: str, model: Optional[str] = None):
         """Invoke with retries on transient errors."""
 
@@ -206,10 +188,7 @@ class LLMService:
 
         return _call()
 
-    # ────────────────────────────────────────────────────────
     # Response normalization
-    # ────────────────────────────────────────────────────────
-
     def _extract_content(self, response) -> tuple[str, CallStats]:
         """Convert any LangChain response into a plain string."""
         model_name = self._settings.LLM_MODEL
@@ -259,10 +238,8 @@ class LLMService:
 
         return str(content).strip(), stats
 
-    # ────────────────────────────────────────────────────────
-    # Core invoke
-    # ────────────────────────────────────────────────────────
 
+    # Core invoke
     def _invoke(self, prompt: str) -> str:
         start = time.perf_counter()
 
@@ -283,10 +260,7 @@ class LLMService:
 
         return content
 
-    # ────────────────────────────────────────────────────────
     # Streaming invoke
-    # ────────────────────────────────────────────────────────
-
     def stream_chat(self, message: str) -> Iterator[str]:
         """Yield content chunks as they arrive from Groq."""
         system = PromptLibrary.GENERAL_CHAT
@@ -307,10 +281,7 @@ class LLMService:
             logger.exception("Streaming failed: %s", exc)
             raise LLMUnavailableError(str(exc)) from exc
 
-    # ────────────────────────────────────────────────────────
     # JSON extraction
-    # ────────────────────────────────────────────────────────
-
     @staticmethod
     def _extract_json(raw: str) -> Optional[dict]:
         """Extract a JSON object from LLM output, tolerant of fences."""
@@ -359,14 +330,11 @@ class LLMService:
     def _compose(system: str, context: str, user_input: str) -> str:
         return (
             f"{system}\n\n"
-            f"─────── CONTEXT FROM SQL DOCUMENTATION ───────\n{context}\n\n"
-            f"─────── USER INPUT ───────\n{user_input}\n"
+            f"CONTEXT FROM SQL DOCUMENTATION \n{context}\n\n"
+            f"USER INPUT \n{user_input}\n"
         )
-
-    # ────────────────────────────────────────────────────────
+    
     # Public task methods
-    # ────────────────────────────────────────────────────────
-
     def generate_sql(
         self,
         question: str,
@@ -432,11 +400,7 @@ class LLMService:
             f"{system}\n\nUser: {_sanitize_user_input(message)}"
         )
 
-
-# ────────────────────────────────────────────────────────────
 # Thread-safe singleton
-# ────────────────────────────────────────────────────────────
-
 _llm_instance: Optional[LLMService] = None
 _llm_lock = threading.Lock()
 

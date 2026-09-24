@@ -39,11 +39,7 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/text-to-sql", tags=["Text → SQL"])
 
-
-# ────────────────────────────────────────────────────────────
 # Schemas
-# ────────────────────────────────────────────────────────────
-
 class TextToSqlRequest(BaseModel):
     question: str = Field(..., min_length=1, max_length=1000)
     dialect: str = Field(default="postgres", pattern="^(postgres|mysql|sqlite)$")
@@ -58,11 +54,7 @@ class TextToSqlResponse(BaseModel):
     request_id: str
     timings_ms: dict[str, float]
 
-
-# ────────────────────────────────────────────────────────────
 # Handler
-# ────────────────────────────────────────────────────────────
-
 class TextToSqlHandler:
     """Encapsulates the /text-to-sql business flow."""
 
@@ -79,10 +71,7 @@ class TextToSqlHandler:
         self._retriever = retriever
         self._llm = llm
 
-    # ────────────────────────────────────────────────────────
     # Pipeline steps
-    # ────────────────────────────────────────────────────────
-
     def _check_cache(
         self,
         question: str,
@@ -176,10 +165,7 @@ class TextToSqlHandler:
             )
         return result, (time.perf_counter() - start) * 1000
 
-    # ────────────────────────────────────────────────────────
     # Public entry point
-    # ────────────────────────────────────────────────────────
-
     def handle(
         self,
         req: TextToSqlRequest,
@@ -256,20 +242,12 @@ class TextToSqlHandler:
             timings_ms=timings,
         )
 
-
-# ────────────────────────────────────────────────────────────
 # Request ID helper
-# ────────────────────────────────────────────────────────────
-
 def _get_request_id(request: Request) -> str:
     rid = request.headers.get("x-request-id")
     return rid or str(uuid.uuid4())[:8]
 
-
-# ────────────────────────────────────────────────────────────
 # Routes
-# ────────────────────────────────────────────────────────────
-
 @router.post("", response_model=TextToSqlResponse)
 async def text_to_sql(
     req: TextToSqlRequest,

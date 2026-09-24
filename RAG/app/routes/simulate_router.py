@@ -39,11 +39,7 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/simulate", tags=["Simulate"])
 
-
-# ────────────────────────────────────────────────────────────
 # Canonical schema
-# ────────────────────────────────────────────────────────────
-
 CANONICAL_SCHEMA = """
 users(user_id SERIAL PK, email VARCHAR(255) UNIQUE, full_name VARCHAR(100),
       created_at TIMESTAMP, country VARCHAR(2), is_active BOOLEAN)
@@ -64,10 +60,7 @@ departments(department_id SERIAL PK, name VARCHAR(100), budget DECIMAL(12,2))
 SCHEMA_VERSION = "v1"
 
 
-# ────────────────────────────────────────────────────────────
 # Schemas
-# ────────────────────────────────────────────────────────────
-
 class SimulateRequest(BaseModel):
     sql: str = Field(..., min_length=1, max_length=5000)
     dialect: str = Field(default="postgres", pattern="^(postgres|mysql|sqlite)$")
@@ -95,10 +88,7 @@ class SimulateResponse(BaseModel):
     timings_ms: dict[str, float]
 
 
-# ────────────────────────────────────────────────────────────
 # Response normalization
-# ────────────────────────────────────────────────────────────
-
 class SimulationNormalizer:
     """Normalizes the raw LLM simulation output into a strict shape."""
 
@@ -173,11 +163,7 @@ class SimulationNormalizer:
             for k in cls.ERROR_KEYS
         )
 
-
-# ────────────────────────────────────────────────────────────
 # Handler
-# ────────────────────────────────────────────────────────────
-
 class SimulateHandler:
     """Encapsulates the /simulate business flow."""
 
@@ -187,10 +173,7 @@ class SimulateHandler:
         self._cache = cache
         self._llm = llm
 
-    # ────────────────────────────────────────────────────────
     # Cache
-    # ────────────────────────────────────────────────────────
-
     def _cache_extras(self, dialect: str) -> dict:
         # Schema version participates in the cache key so the results are
         # invalidated when the canonical schema changes.
@@ -207,10 +190,7 @@ class SimulateHandler:
         )
         return cached, source, (time.perf_counter() - start) * 1000
 
-    # ────────────────────────────────────────────────────────
     # LLM
-    # ────────────────────────────────────────────────────────
-
     def _simulate(self, sql: str, dialect: str) -> tuple[dict, float]:
         start = time.perf_counter()
 
@@ -244,9 +224,7 @@ class SimulateHandler:
         normalized = SimulationNormalizer.normalize(raw)
         return normalized, (time.perf_counter() - start) * 1000
 
-    # ────────────────────────────────────────────────────────
     # Public entry point
-    # ────────────────────────────────────────────────────────
 
     def handle(
         self,
@@ -308,20 +286,12 @@ class SimulateHandler:
             timings_ms=timings,
         )
 
-
-# ────────────────────────────────────────────────────────────
 # Request ID helper
-# ────────────────────────────────────────────────────────────
-
 def _get_request_id(request: Request) -> str:
     rid = request.headers.get("x-request-id")
     return rid or str(uuid.uuid4())[:8]
 
-
-# ────────────────────────────────────────────────────────────
 # Routes
-# ────────────────────────────────────────────────────────────
-
 @router.post("", response_model=SimulateResponse)
 async def simulate(
     req: SimulateRequest,

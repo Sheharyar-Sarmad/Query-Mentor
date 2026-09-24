@@ -2,7 +2,6 @@
 Central prompt library — all system prompts as class attributes.
 """
 
-
 class PromptLibrary:
     """Container for all system prompts used by the LLM service."""
 

@@ -38,11 +38,7 @@ from app.config.settings import Settings, settings as global_settings
 
 logger = logging.getLogger(__name__)
 
-
-# ────────────────────────────────────────────────────────────
 # Errors
-# ────────────────────────────────────────────────────────────
-
 class RetrieverError(Exception):
     """Base error for retrieval failures."""
 
@@ -54,14 +50,10 @@ class IndexNotReadyError(RetrieverError):
 class EmbeddingError(RetrieverError):
     """Embedding generation failed."""
 
-
-# ────────────────────────────────────────────────────────────
 # Metrics
-# ────────────────────────────────────────────────────────────
-
 @dataclass
 class RetrievalMetrics:
-    """Per-process retrieval metrics."""
+    # Per-process retrieval metrics
     searches: int = 0
     searches_with_hits: int = 0
     total_docs_retrieved: int = 0
@@ -100,13 +92,9 @@ class RetrievalMetrics:
                 "errors": self.errors,
             }
 
-
-# ────────────────────────────────────────────────────────────
 # RetrieverService
-# ────────────────────────────────────────────────────────────
-
 class RetrieverService:
-    """Thread-safe Pinecone + embeddings manager."""
+    # Thread-safe Pinecone + embeddings manager
 
     INDEX_READY_TIMEOUT = 120   # seconds
     INDEX_POLL_INTERVAL = 2     # seconds
@@ -134,10 +122,7 @@ class RetrieverService:
         # Metrics
         self.metrics = RetrievalMetrics()
 
-    # ────────────────────────────────────────────────────────
     # Lazy-loaded resources
-    # ────────────────────────────────────────────────────────
-
     @property
     def embeddings(self) -> FastEmbedEmbeddings:
         if self._embeddings is None:
@@ -183,10 +168,7 @@ class RetrieverService:
                     )
         return self._vector_store
 
-    # ────────────────────────────────────────────────────────
     # Index management
-    # ────────────────────────────────────────────────────────
-
     @retry(
         reraise=True,
         stop=stop_after_attempt(3),
@@ -226,7 +208,7 @@ class RetrieverService:
         return self.pinecone.Index(name)
 
     def _wait_for_index_ready(self, name: str) -> None:
-        """Poll until the index is ready or the timeout elapses."""
+        # Poll until the index is ready or the timeout elapses
         deadline = time.monotonic() + self.INDEX_READY_TIMEOUT
         while time.monotonic() < deadline:
             try:
@@ -244,10 +226,7 @@ class RetrieverService:
             f"{self.INDEX_READY_TIMEOUT}s"
         )
 
-    # ────────────────────────────────────────────────────────
     # Search modes
-    # ────────────────────────────────────────────────────────
-
     def get_retriever(
         self,
         search_type: str = "mmr",
@@ -257,12 +236,12 @@ class RetrieverService:
         namespace: Optional[str] = None,
         filter: Optional[dict] = None,
     ):
-        """
-        Return a retriever configured for the requested search type.
+        
+        # Return a retriever configured for the requested search type.
 
-        If no namespace is provided, defaults to DEFAULT_NAMESPACE so
-        retrieval matches the namespace IngestionService writes to.
-        """
+        # If no namespace is provided, defaults to DEFAULT_NAMESPACE so
+        # retrieval matches the namespace IngestionService writes to.
+        
         search_kwargs: dict[str, Any] = {
             "k": k or self._settings.RETRIEVER_K,
             "namespace": namespace or self.DEFAULT_NAMESPACE,
@@ -295,7 +274,7 @@ class RetrieverService:
         namespace: Optional[str] = None,
         filter: Optional[dict] = None,
     ) -> list:
-        """Direct similarity search with metrics + structured error handling."""
+        # Direct similarity search with metrics + structured error handling
         start = time.perf_counter()
         k = k or self._settings.RETRIEVER_K
 
@@ -328,7 +307,7 @@ class RetrieverService:
         namespace: Optional[str] = None,
         filter: Optional[dict] = None,
     ) -> list[tuple[Any, float]]:
-        """Similarity search returning (doc, score) pairs."""
+        # Similarity search returning (doc, score) pairs
         start = time.perf_counter()
         k = k or self._settings.RETRIEVER_K
 
@@ -350,12 +329,9 @@ class RetrieverService:
         self.metrics.record_search(len(results), latency_ms)
         return results
 
-    # ────────────────────────────────────────────────────────
     # Embedding (batched)
-    # ────────────────────────────────────────────────────────
-
     def embed_texts(self, texts: list[str]) -> list[list[float]]:
-        """Embed a batch of texts with progress logging."""
+        # Embed a batch of texts with progress logging
         if not texts:
             return []
 
@@ -377,10 +353,7 @@ class RetrieverService:
 
         return vectors
 
-    # ────────────────────────────────────────────────────────
     # Health / diagnostics
-    # ────────────────────────────────────────────────────────
-
     def health(self) -> dict[str, Any]:
         """Return a lightweight health report — safe to call from /health."""
         report: dict[str, Any] = {
@@ -409,7 +382,7 @@ class RetrieverService:
         return report
 
     def warm_up(self) -> None:
-        """Force-load all expensive resources — call at server startup."""
+        # Force-load all expensive resources — call at server startup
         start = time.perf_counter()
         _ = self.embeddings
         _ = self.vector_store
@@ -417,13 +390,9 @@ class RetrieverService:
         logger.info("RetrieverService warmed up in %.0f ms", elapsed)
 
 
-# ────────────────────────────────────────────────────────────
 # Thread-safe singleton
-# ────────────────────────────────────────────────────────────
-
 _retriever_instance: Optional[RetrieverService] = None
 _retriever_lock = threading.Lock()
-
 
 def get_retriever_service() -> RetrieverService:
     global _retriever_instance
