@@ -33,7 +33,6 @@ import {
   RevealStagger,
 } from "@/components/animations/reveal";
 
-// ... (Constants TOOLS, FEATURES, HOW_IT_WORKS, EXAMPLE_QUERIES, FAQ remain the same) ...
 const TOOLS = [
   {
     icon: Wand2,
@@ -190,7 +189,6 @@ export default function Home() {
           </Badge>
         </Reveal>
 
-        {/* FIX 1 & 2: Flex column for h1, solid color for SQL Mentor, w-full for constraints */}
         <h1 className="mx-auto w-full max-w-4xl font-display text-5xl font-semibold leading-[1.05] tracking-tight md:text-7xl flex flex-col items-center justify-center gap-2">
           <HeroText text="Your AI" delay={0.1} />
           <span className="text-indigo-400 inline-block">
@@ -214,15 +212,21 @@ export default function Home() {
           transition={{ delay: 1.05, duration: 0.5 }}
           className="mt-10 flex flex-wrap items-center justify-center gap-3"
         >
-          {/* FIX 3: Force flex-row and whitespace-nowrap on buttons */}
-          <Button asChild size="lg" className="bg-accent hover:bg-accent/90 flex flex-row items-center justify-center whitespace-nowrap">
-            <Link href="/tools" className="flex flex-row items-center gap-2">
-              Open SQL Tools
-              <ArrowRight className="h-4 w-4" />
-            </Link>
+          <Button
+            size="lg"
+            render={<Link href="/tools" />}
+            className="bg-accent hover:bg-accent/90 flex flex-row items-center justify-center whitespace-nowrap"
+          >
+            Open SQL Tools
+            <ArrowRight className="h-4 w-4" />
           </Button>
-          <Button asChild size="lg" variant="outline" className="flex flex-row items-center justify-center whitespace-nowrap">
-            <Link href="/tools#chat">Ask a question</Link>
+          <Button
+            size="lg"
+            variant="outline"
+            render={<Link href="/tools#chat" />}
+            className="flex flex-row items-center justify-center whitespace-nowrap"
+          >
+            Ask a question
           </Button>
         </motion.div>
 
@@ -411,11 +415,13 @@ export default function Home() {
 
         <Reveal delay={0.1}>
           <div className="mt-8 text-center">
-            <Button asChild variant="outline" className="flex flex-row items-center justify-center whitespace-nowrap">
-              <Link href="/tools" className="flex flex-row items-center gap-2">
-                Try your own
-                <ArrowRight className="h-4 w-4" />
-              </Link>
+            <Button
+              variant="outline"
+              render={<Link href="/tools" />}
+              className="flex flex-row items-center justify-center whitespace-nowrap"
+            >
+              Try your own
+              <ArrowRight className="h-4 w-4" />
             </Button>
           </div>
         </Reveal>
@@ -463,21 +469,27 @@ export default function Home() {
               No sign-up. No credit card. Just open the tools and ask.
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-              <Button asChild size="lg" className="bg-accent hover:bg-accent/90 flex flex-row items-center justify-center whitespace-nowrap">
-                <Link href="/tools" className="flex flex-row items-center gap-2">
-                  Open SQL Tools
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
+              <Button
+                size="lg"
+                render={<Link href="/tools" />}
+                className="bg-accent hover:bg-accent/90 flex flex-row items-center justify-center whitespace-nowrap"
+              >
+                Open SQL Tools
+                <ArrowRight className="h-4 w-4" />
               </Button>
-              <Button asChild size="lg" variant="outline" className="flex flex-row items-center justify-center whitespace-nowrap">
-                <a
-                  href="https://github.com/Sheharyar-Sarmad/ai-zero-to-hero"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex flex-row items-center gap-2"
-                >
-                  Star on GitHub
-                </a>
+              <Button
+                size="lg"
+                variant="outline"
+                render={
+                  <a
+                    href="https://github.com/Sheharyar-Sarmad/ai-zero-to-hero"
+                    target="_blank"
+                    rel="noreferrer"
+                  />
+                }
+                className="flex flex-row items-center justify-center whitespace-nowrap"
+              >
+                Star on GitHub
               </Button>
             </div>
           </div>
