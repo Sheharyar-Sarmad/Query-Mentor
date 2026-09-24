@@ -212,8 +212,7 @@ class Server:
             ["*"]
             if self._settings.is_development
             else [
-                "https://querymentor.vercel.app",
-                "https://querymentor.app",
+                "https://query-mentor-seven.vercel.app/"
             ]
         )
 
