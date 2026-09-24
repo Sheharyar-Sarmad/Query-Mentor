@@ -35,7 +35,11 @@ export default function ToolsPage() {
         </p>
       </motion.div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full flex flex-col min-w-0">
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="w-full flex flex-col min-w-0"
+      >
         {/* Removed the tricky calc() width. Standard -mx margins work perfectly */}
         <div className="sticky top-14 z-30 -mx-4 border-b border-border bg-background/80 px-4 backdrop-blur md:-mx-8 md:px-8">
           <TabsList className="h-12 w-full justify-start gap-1 rounded-none border-0 bg-transparent p-0 overflow-x-auto overflow-y-hidden">
@@ -65,17 +69,26 @@ export default function ToolsPage() {
             className="w-full min-w-0 pt-6"
           >
             {activeTab === "console" && (
-              <TabsContent value="console" forceMount className="w-full min-w-0 m-0 outline-none">
+              <TabsContent
+                value="console"
+                className="w-full min-w-0 m-0 outline-none"
+              >
                 <SqlConsole />
               </TabsContent>
             )}
             {activeTab === "learn" && (
-              <TabsContent value="learn" forceMount className="w-full min-w-0 m-0 outline-none">
+              <TabsContent
+                value="learn"
+                className="w-full min-w-0 m-0 outline-none"
+              >
                 <LearnTab />
               </TabsContent>
             )}
             {activeTab === "chat" && (
-              <TabsContent value="chat" forceMount className="w-full min-w-0 m-0 outline-none">
+              <TabsContent
+                value="chat"
+                className="w-full min-w-0 m-0 outline-none"
+              >
                 <ChatTab />
               </TabsContent>
             )}
