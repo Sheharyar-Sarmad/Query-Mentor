@@ -8,6 +8,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { ThreeBackground } from "@/components/three-bg";
 import { MotionProviders } from "@/components/motion-providers";
+import { SmoothScroll } from "@/components/smooth-scroll";
 import "./globals.css";
 
 const inter = Inter({
@@ -144,37 +145,110 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           enableSystem
           disableTransitionOnChange
         >
-          <ThreeBackground />
+          <SmoothScroll>
+            <ThreeBackground />
 
-          {/* Header — full width, padded */}
-          <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur">
-            <div className="mx-auto flex h-14 w-full max-w-screen-2xl items-center justify-between px-4 md:px-8">
-              <Link
-                href="/"
-                className="flex items-center gap-2 text-lg font-semibold tracking-tight"
-              >
-                <img
-                  src="/logo.png"
-                  alt="QueryMentor logo"
-                  className="h-6 w-6 rounded"
-                />
-                <span>
-                  Query<span className="text-accent">Mentor</span>
-                </span>
-              </Link>
+            {/* Header — full width, padded */}
+            <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur">
+              <div className="mx-auto flex h-14 w-full max-w-screen-2xl items-center justify-between px-4 md:px-8">
+                <Link
+                  href="/"
+                  className="flex items-center gap-2 text-lg font-semibold tracking-tight"
+                >
+                  <img
+                    src="/logo.png"
+                    alt="QueryMentor logo"
+                    className="h-6 w-6 rounded"
+                  />
+                  <span>
+                    Query<span className="text-accent">Mentor</span>
+                  </span>
+                </Link>
 
-              <nav className="flex items-center gap-1 text-sm">
-                {NAV.map((item) => (
+                <nav className="flex items-center gap-1 text-sm">
+                  {NAV.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className="rounded-md px-3 py-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+
+                  <div className="ml-2 flex items-center gap-1 border-l border-border pl-2">
+                    {SOCIALS.map(({ href, label, Icon }) => (
+                      <a
+                        key={label}
+                        href={href}
+                        target="_blank"
+                        rel="noreferrer"
+                        aria-label={label}
+                        className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                      >
+                        <Icon className="h-4 w-4" />
+                      </a>
+                    ))}
+                    <ThemeToggle />
+                  </div>
+                </nav>
+              </div>
+            </header>
+
+            {/* Main — full width, wider padding */}
+            <main className="relative mx-auto flex w-full max-w-screen-2xl flex-1 flex-col min-w-0 px-4 py-10 md:px-8">
+              <MotionProviders>{children}</MotionProviders>
+            </main>
+
+            {/* Footer */}
+            <footer className="relative border-t border-border">
+              <div className="mx-auto flex w-full max-w-screen-2xl flex-col gap-6 px-4 py-8 text-xs text-muted-foreground md:flex-row md:items-center md:justify-between md:px-8">
+                {/* Left: brand + credit */}
+                <div className="flex flex-col gap-2">
                   <Link
-                    key={item.href}
-                    href={item.href}
-                    className="rounded-md px-3 py-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                    href="/"
+                    className="flex items-center gap-2 text-sm font-semibold text-foreground"
                   >
-                    {item.label}
+                    <img
+                      src="/logo.png"
+                      alt="QueryMentor logo"
+                      className="h-5 w-5 rounded"
+                    />
+                    <span>
+                      Query<span className="text-accent">Mentor</span>
+                    </span>
                   </Link>
-                ))}
+                  <span>Built by Sheharyar Sarmad</span>
+                  <span>RAG · Groq · Pinecone · FastAPI</span>
+                </div>
 
-                <div className="ml-2 flex items-center gap-1 border-l border-border pl-2">
+                {/* Middle: quick links */}
+                <nav className="flex flex-wrap items-center gap-x-5 gap-y-2">
+                  {FOOTER_LINKS.map((link) =>
+                    link.external ? (
+                      <a
+                        key={link.label}
+                        href={link.href}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="transition-colors hover:text-foreground"
+                      >
+                        {link.label}
+                      </a>
+                    ) : (
+                      <Link
+                        key={link.label}
+                        href={link.href}
+                        className="transition-colors hover:text-foreground"
+                      >
+                        {link.label}
+                      </Link>
+                    )
+                  )}
+                </nav>
+
+                {/* Right: social icons */}
+                <div className="flex items-center gap-2">
                   {SOCIALS.map(({ href, label, Icon }) => (
                     <a
                       key={label}
@@ -187,83 +261,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                       <Icon className="h-4 w-4" />
                     </a>
                   ))}
-                  <ThemeToggle />
                 </div>
-              </nav>
-            </div>
-          </header>
-
-          {/* Main — full width, wider padding */}
-          <main className="relative mx-auto flex w-full max-w-screen-2xl flex-1 flex-col min-w-0 px-4 py-10 md:px-8">
-            <MotionProviders>{children}</MotionProviders>
-          </main>
-
-          {/* Footer */}
-          <footer className="relative border-t border-border">
-            <div className="mx-auto flex w-full max-w-screen-2xl flex-col gap-6 px-4 py-8 text-xs text-muted-foreground md:flex-row md:items-center md:justify-between md:px-8">
-              {/* Left: brand + credit */}
-              <div className="flex flex-col gap-2">
-                <Link
-                  href="/"
-                  className="flex items-center gap-2 text-sm font-semibold text-foreground"
-                >
-                  <img
-                    src="/logo.png"
-                    alt="QueryMentor logo"
-                    className="h-5 w-5 rounded"
-                  />
-                  <span>
-                    Query<span className="text-accent">Mentor</span>
-                  </span>
-                </Link>
-                <span>Built by Sheharyar Sarmad</span>
-                <span>RAG · Groq · Pinecone · FastAPI</span>
               </div>
+            </footer>
 
-              {/* Middle: quick links */}
-              <nav className="flex flex-wrap items-center gap-x-5 gap-y-2">
-                {FOOTER_LINKS.map((link) =>
-                  link.external ? (
-                    <a
-                      key={link.label}
-                      href={link.href}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="transition-colors hover:text-foreground"
-                    >
-                      {link.label}
-                    </a>
-                  ) : (
-                    <Link
-                      key={link.label}
-                      href={link.href}
-                      className="transition-colors hover:text-foreground"
-                    >
-                      {link.label}
-                    </Link>
-                  )
-                )}
-              </nav>
-
-              {/* Right: social icons */}
-              <div className="flex items-center gap-2">
-                {SOCIALS.map(({ href, label, Icon }) => (
-                  <a
-                    key={label}
-                    href={href}
-                    target="_blank"
-                    rel="noreferrer"
-                    aria-label={label}
-                    className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                  >
-                    <Icon className="h-4 w-4" />
-                  </a>
-                ))}
-              </div>
-            </div>
-          </footer>
-
-          <Toaster theme="dark" position="bottom-right" richColors />
+            <Toaster theme="dark" position="bottom-right" richColors />
+          </SmoothScroll>
         </ThemeProvider>
       </body>
     </html>
